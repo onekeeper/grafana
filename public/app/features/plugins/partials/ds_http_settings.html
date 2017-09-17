@@ -1,11 +1,11 @@
 
 
 <div class="gf-form-group">
-  <h3 class="page-heading">Http settings</h3>
+  <h3 class="page-heading">Http 设置</h3>
   <div class="gf-form-group">
     <div class="gf-form-inline">
       <div class="gf-form max-width-30">
-        <span class="gf-form-label width-7">Url</span>
+        <span class="gf-form-label width-7">Url 地址</span>
         <input class="gf-form-input" type="text"
               ng-model='current.url' placeholder="{{suggestUrl}}"
               bs-typeahead="getSuggestUrls"  min-length="0"
@@ -26,7 +26,7 @@
 
     <div class="gf-form-inline">
       <div class="gf-form max-width-30">
-        <span class="gf-form-label width-7">Access</span>
+        <span class="gf-form-label width-7">访问方式</span>
         <div class="gf-form-select-wrapper gf-form-select-wrapper--has-help-icon max-width-24">
           <select class="gf-form-input" ng-model="current.access" ng-options="f for f in ['direct', 'proxy']"></select>
           <info-popover mode="right-absolute">
@@ -38,7 +38,7 @@
     </div>
   </div>
 
-  <h3 class="page-heading">Http Auth</h3>
+  <h3 class="page-heading">Http 认证</h3>
 
 	<div class="gf-form-inline">
 		<gf-form-switch class="gf-form"
@@ -63,7 +63,7 @@
 </div>
 
 <div class="gf-form-group" ng-if="current.basicAuth">
-  <h6>Basic Auth Details</h6>
+  <h6>Basic Auth 设置</h6>
 	<div class="gf-form" ng-if="current.basicAuth">
 		<span class="gf-form-label width-7">
 			User
@@ -81,7 +81,7 @@
 
 <div class="gf-form-group" ng-if="current.jsonData.tlsAuth && current.access=='proxy'">
   <div class="gf-form">
-    <h6>TLS Auth Details</h6>
+    <h6>TLS Auth 设置</h6>
     <info-popover mode="header">TLS Certs are encrypted and stored in the Grafana database.</info-popover>
   </div>
   <div ng-if="current.jsonData.tlsAuthWithCACert">

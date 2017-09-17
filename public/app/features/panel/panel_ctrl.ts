@@ -140,17 +140,17 @@ export class PanelCtrl {
 
   getMenu() {
     let menu = [];
-    menu.push({text: 'View', click: 'ctrl.viewPanel(); dismiss();'});
-    menu.push({text: 'Edit', click: 'ctrl.editPanel(); dismiss();', role: 'Editor'});
+    menu.push({text: '查看', click: 'ctrl.viewPanel(); dismiss();'});
+    menu.push({text: '编辑', click: 'ctrl.editPanel(); dismiss();', role: 'Editor'});
     if (!this.fullscreen) { //  duplication is not supported in fullscreen mode
-      menu.push({ text: 'Duplicate', click: 'ctrl.duplicate()', role: 'Editor' });
+      menu.push({ text: '复制', click: 'ctrl.duplicate()', role: 'Editor' });
     }
-    menu.push({text: 'Share', click: 'ctrl.sharePanel(); dismiss();'});
+    menu.push({text: '分享', click: 'ctrl.sharePanel(); dismiss();'});
     return menu;
   }
 
   getExtendedMenu() {
-    var actions = [{text: 'Panel JSON', click: 'ctrl.editPanelJson(); dismiss();'}];
+    var actions = [{text: '面板 JSON', click: 'ctrl.editPanelJson(); dismiss();'}];
     this.events.emit('init-panel-actions', actions);
     return actions;
   }

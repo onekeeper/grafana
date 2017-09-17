@@ -17,21 +17,17 @@ function (angular, _, $, moment, config) {
     $scope.init = function() {
       $scope.modeSharePanel = $scope.panel ? true : false;
 
-      $scope.tabs = [{title: 'Link', src: 'shareLink.html'}];
+      $scope.tabs = [];
 
       if ($scope.modeSharePanel) {
-        $scope.modalTitle = 'Share Panel';
-        $scope.tabs.push({title: 'Embed', src: 'shareEmbed.html'});
+        $scope.modalTitle = '分享面板';
+        $scope.tabs.push({title: '嵌入', src: 'shareEmbed.html'});
       } else {
-        $scope.modalTitle = 'Share';
-      }
-
-      if (!$scope.dashboard.meta.isSnapshot) {
-        $scope.tabs.push({title: 'Snapshot', src: 'shareSnapshot.html'});
+        $scope.modalTitle = '分享';
       }
 
       if (!$scope.dashboard.meta.isSnapshot && !$scope.modeSharePanel) {
-        $scope.tabs.push({title: 'Export', src: 'shareExport.html'});
+        $scope.tabs.push({title: '导出', src: 'shareExport.html'});
       }
 
       $scope.buildUrl();

@@ -2,17 +2,17 @@
 
 <div class="page-container">
   <div class="page-header">
-    <h1>Saved playlists</h1>
+    <h1>播放列表清单</h1>
     <a class="btn btn-success pull-right" href="playlists/create">
       <i class="fa fa-plus"></i>
-      New Playlist
+      新建
     </a>
   </div>
 
   <table class="filter-table" style="margin-top: 20px">
     <thead>
-      <th><strong>Name</strong></th>
-      <th><strong>Start url</strong></th>
+      <th><strong>名称</strong></th>
+      <th><strong>地址</strong></th>
       <th style="width: 68px"></th>
       <th style="width: 78px"></th>
       <th style="width: 25px"></th>
@@ -27,13 +27,12 @@
       <td class="text-center">
         <a href="playlists/play/{{playlist.id}}" class="btn btn-inverse btn-small">
           <i class="fa fa-play"></i>
-          Play
         </a>
       </td>
       <td  class="text-right">
         <a href="playlists/edit/{{playlist.id}}" class="btn btn-inverse btn-small">
           <i class="fa fa-edit"></i>
-          Edit
+          编辑
         </a>
       </td>
       <td  class="text-right">

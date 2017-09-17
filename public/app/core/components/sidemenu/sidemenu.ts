@@ -46,35 +46,13 @@ export class SideMenuCtrl {
 
  openUserDropdown() {
    this.orgMenu = [
-     {section: 'You', cssClass: 'dropdown-menu-title'},
-     {text: 'Profile', url: this.getUrl('/profile')},
+     {text: '个人设置', url: this.getUrl('/profile')},
    ];
 
    if (this.showSignout) {
-     this.orgMenu.push({text: "Sign out", url: this.getUrl("/logout"), target: "_self"});
+     this.orgMenu.push({cssClass: "divider"});
+     this.orgMenu.push({text: "注销", url: this.getUrl("/logout"), target: "_self"});
    }
-
-   if (this.contextSrv.hasRole('Admin')) {
-     this.orgMenu.push({section: this.user.orgName, cssClass: 'dropdown-menu-title'});
-     this.orgMenu.push({
-       text: "Preferences",
-       url: this.getUrl("/org")
-     });
-     this.orgMenu.push({
-       text: "Users",
-       url: this.getUrl("/org/users")
-     });
-     this.orgMenu.push({
-       text: "API Keys",
-       url: this.getUrl("/org/apikeys")
-     });
-   }
-
-   this.orgMenu.push({cssClass: "divider"});
-   this.backendSrv.get('/api/user/orgs').then(orgs => {
-     this.orgs = orgs;
-     this.loadOrgsItems();
-   });
  }
 
  loadOrgsItems(){

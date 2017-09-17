@@ -93,5 +93,5 @@ export class DatasourceVariable implements Variable {
 variableTypes['datasource'] = {
   name: 'Datasource',
   ctor: DatasourceVariable,
-  description: 'Enabled you to dynamically switch the datasource for multiple panels',
+  description: '能够为面板动态切换数据源',
 };

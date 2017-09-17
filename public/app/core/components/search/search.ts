@@ -113,7 +113,7 @@ export class SearchCtrl {
       });
 
       if (this.queryHasNoFilters()) {
-        this.results.unshift({ title: 'Home', url: config.appSubUrl + '/', type: 'dash-home' });
+        this.results.unshift({ title: '首页', url: config.appSubUrl + '/', type: 'dash-home' });
       }
     });
   }

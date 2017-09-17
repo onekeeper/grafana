@@ -182,10 +182,10 @@ export class DashboardModel {
     }
 
     appEvents.emit('confirm-modal', {
-      title: 'Remove Row',
-      text: 'Are you sure you want to remove this row?',
+      title: '删除行',
+      text: '是否确定删除该行?',
       icon: 'fa-trash',
-      yesText: 'Delete',
+      yesText: '删除',
       onConfirm: () => {
         this.rows.splice(index, 1);
         row.destroy();

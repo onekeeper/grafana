@@ -93,12 +93,12 @@ export class DashboardRow {
       }
 
       appEvents.emit('confirm-modal', {
-        title: 'Remove Panel',
-        text: 'Are you sure you want to remove this panel?',
+        title: '删除面板',
+        text: '是否确定删除该面板?',
         text2: text2,
         icon: 'fa-trash',
         confirmText: confirmText,
-        yesText: 'Remove',
+        yesText: '删除',
         onConfirm: () => {
           this.removePanel(panel, false);
         }

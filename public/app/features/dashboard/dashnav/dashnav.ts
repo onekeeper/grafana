@@ -109,12 +109,12 @@ export class DashNavCtrl {
       }
 
       appEvents.emit('confirm-modal', {
-        title: 'Delete',
-        text: 'Do you want to delete this dashboard?',
+        title: '删除',
+        text: '是否确定删除该仪表板?',
         text2: text2,
         icon: 'fa-trash',
         confirmText: confirmText,
-        yesText: 'Delete',
+        yesText: '删除',
         onConfirm: () => {
           this.dashboard.meta.canSave = false;
           this.deleteDashboardConfirmed();

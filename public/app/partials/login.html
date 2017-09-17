@@ -4,13 +4,12 @@
 
 		<div class="login-box-logo">
 			<img class="logo-icon" src="public/img/grafana_icon.svg"></img><br>
-			<i class="icon-gf icon-gf-grafana_wordmark"></i>
 		</div>
 
     <div class="login-inner-box">
 			<div class="login-tab-header">
 				<button class="btn-login-tab" ng-click="loginMode = true;" ng-class="{active: loginMode}">
-					Log in
+					登录
 				</button>
 				<button class="btn-login-tab" ng-click="loginMode = false;" ng-class="{active: !loginMode}" ng-show="!disableUserSignUp">
 					Sign up
@@ -19,12 +18,12 @@
 
       <form name="loginForm" class="login-form gf-form-group" ng-hide="disableLoginForm">
 				<div class="gf-form" ng-if="loginMode">
-					<span class="gf-form-label width-7">User</span>
-					<input type="text" name="username" class="gf-form-input max-width-14" required ng-model='formModel.user' placeholder={{loginHint}}>
+					<span class="gf-form-label width-7">账号</span>
+					<input type="text" name="username" class="gf-form-input max-width-14" required ng-model='formModel.user' placeholder="用户名或邮箱">
 				</div>
 				<div class="gf-form" ng-if="loginMode">
-					<span class="gf-form-label width-7">Password</span>
-					<input type="password" name="password" class="gf-form-input max-width-14" required ng-model="formModel.password" id="inputPassword" placeholder="password">
+					<span class="gf-form-label width-7">密码</span>
+					<input type="password" name="password" class="gf-form-input max-width-14" required ng-model="formModel.password" id="inputPassword" placeholder="密码">
 				</div>
 
 				<div class="gf-form" ng-if="!loginMode">
@@ -75,9 +74,6 @@
 
 		<div class="text-center password-recovery" ng-hide="disableLoginForm">
 			<div class="text-center">
-				<a href="user/password/send-reset-email">
-					Forgot your password?
-				</a>
 			</div>
 		</div>
 

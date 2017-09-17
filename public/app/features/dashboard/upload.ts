@@ -7,7 +7,7 @@ var template = `
 <input type="file" id="dashupload" name="dashupload" class="hide"/>
 <label class="btn btn-secondary" for="dashupload">
   <i class="fa fa-upload"></i>
-  Upload .json File
+  上传 JSON 文件
 </label>
 `;
 

@@ -56,5 +56,5 @@ export class ConstantVariable implements Variable {
 variableTypes['constant'] = {
   name: 'Constant',
   ctor: ConstantVariable,
-  description: 'Define a hidden constant variable, useful for metric prefixes in dashboards you want to share' ,
+  description: '定义隐藏的常量' ,
 };

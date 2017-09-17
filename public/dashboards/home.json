@@ -1,6 +1,6 @@
 {
   "id": null,
-  "title": "Home",
+  "title": "首页",
   "tags": [],
   "style": "dark",
   "timezone": "browser",
@@ -9,13 +9,13 @@
   "sharedCrosshair": false,
   "rows": [
    {
-      "title": "Home Dashboard",
+      "title": "首页",
       "collapse": false,
       "editable": true,
       "height": "25px",
       "panels": [
         {
-          "content": "<div class=\"text-center dashboard-header\">\n  <span>Home Dashboard</span>\n</div>",
+          "content": "<div class=\"text-center dashboard-header\">\n  <span>首页</span>\n</div>",
           "editable": true,
           "id": 1,
           "links": [],

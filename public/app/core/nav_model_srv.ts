@@ -38,13 +38,13 @@ export class NavModelSrv {
   getDatasourceNav(subPage) {
     return {
       section: {
-        title: 'Data Sources',
+        title: '数据源',
         url: 'datasources',
         icon: 'icon-gf icon-gf-datasources'
       },
       menu: [
-        {title: 'List view', active: subPage === 0, url: 'datasources', icon: 'fa fa-list-ul'},
-        {title: 'Add data source', active: subPage === 1, url: 'datasources/new', icon: 'fa fa-plus'},
+        {title: '清单', active: subPage === 0, url: 'datasources', icon: 'fa fa-list-ul'},
+        {title: '新建', active: subPage === 1, url: 'datasources/new', icon: 'fa fa-plus'},
       ]
     };
   }
@@ -52,13 +52,13 @@ export class NavModelSrv {
   getPlaylistsNav(subPage) {
     return {
       section: {
-        title: 'Playlists',
+        title: '播放列表',
         url: 'playlists',
         icon: 'fa fa-fw fa-film'
       },
       menu: [
-        {title: 'List view', active: subPage === 0, url: 'playlists', icon: 'fa fa-list-ul'},
-        {title: 'Add Playlist', active: subPage === 1, url: 'playlists/create', icon: 'fa fa-plus'},
+        {title: '清单', active: subPage === 0, url: 'playlists', icon: 'fa fa-list-ul'},
+        {title: '新建', active: subPage === 1, url: 'playlists/create', icon: 'fa fa-plus'},
       ]
     };
   }
@@ -66,7 +66,7 @@ export class NavModelSrv {
   getProfileNav() {
     return {
       section: {
-        title: 'User Profile',
+        title: '个人设置',
         url: 'profile',
         icon: 'fa fa-fw fa-user'
       },
@@ -103,16 +103,13 @@ export class NavModelSrv {
   getAdminNav(subPage) {
     return {
       section: {
-        title: 'Admin',
+        title: '管理',
         url: 'admin',
         icon: 'fa fa-fw fa-cogs'
       },
       menu: [
-        {title: 'Users', active: subPage === 0, url: 'admin/users', icon: 'fa fa-fw fa-user'},
-        {title: 'Orgs', active: subPage === 1, url: 'admin/orgs', icon: 'fa fa-fw fa-users'},
-        {title: 'Server Settings', active: subPage === 2, url: 'admin/settings', icon: 'fa fa-fw fa-cogs'},
-        {title: 'Server Stats', active: subPage === 2, url: 'admin/stats', icon: 'fa fa-fw fa-line-chart'},
-        {title: 'Style Guide', active: subPage === 2, url: 'styleguide', icon: 'fa fa-fw fa-key'},
+        {title: '用户管理', active: subPage === 0, url: 'admin/users', icon: 'fa fa-fw fa-user'},
+        {title: '统计信息', active: subPage === 2, url: 'admin/stats', icon: 'fa fa-fw fa-line-chart'},
       ]
     };
   }
@@ -120,7 +117,7 @@ export class NavModelSrv {
   getPluginsNav() {
     return {
       section: {
-        title: 'Plugins',
+        title: '插件',
         url: 'plugins',
         icon: 'icon-gf icon-gf-apps'
       },
@@ -150,55 +147,37 @@ export class NavModelSrv {
 
     if (dashboard.meta.canEdit) {
       menu.push({
-        title: 'Settings',
+        title: '设置',
         icon: 'fa fa-fw fa-cog',
         clickHandler: () => dashNavCtrl.openEditView('settings')
       });
 
       menu.push({
-        title: 'Templating',
+        title: '模板',
         icon: 'fa fa-fw fa-code',
         clickHandler: () => dashNavCtrl.openEditView('templating')
       });
 
-      menu.push({
-        title: 'Annotations',
-        icon: 'fa fa-fw fa-bolt',
-        clickHandler: () => dashNavCtrl.openEditView('annotations')
-      });
-
       if (!dashboard.meta.isHome) {
         menu.push({
-          title: 'Version history',
+          title: '版本',
           icon: 'fa fa-fw fa-history',
           clickHandler: () => dashNavCtrl.openEditView('history')
         });
       }
-
-      menu.push({
-        title: 'View JSON',
-        icon: 'fa fa-fw fa-eye',
-        clickHandler: () => dashNavCtrl.viewJson()
-      });
     }
 
     if (this.contextSrv.isEditor && !dashboard.editable) {
       menu.push({
-        title: 'Make Editable',
+        title: '设为可写',
         icon: 'fa fa-fw fa-edit',
         clickHandler: () => dashNavCtrl.makeEditable()
       });
     }
 
-    menu.push({
-      title: 'Shortcuts',
-      icon: 'fa fa-fw fa-keyboard-o',
-      clickHandler: () => dashNavCtrl.showHelpModal()
-    });
-
     if (this.contextSrv.isEditor) {
       menu.push({
-        title: 'Save As ...',
+        title: '另存为...',
         icon: 'fa fa-fw fa-save',
         clickHandler: () => dashNavCtrl.saveDashboardAs()
       });
@@ -206,7 +185,7 @@ export class NavModelSrv {
 
     if (dashboard.meta.canSave) {
       menu.push({
-        title: 'Delete',
+        title: '删除',
         icon: 'fa fa-fw fa-trash',
         clickHandler: () => dashNavCtrl.deleteDashboard()
       });

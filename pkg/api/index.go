@@ -85,19 +85,18 @@ func setIndexViewData(c *middleware.Context) (*dtos.IndexViewData, error) {
 	}
 
 	dashboardChildNavs := []*dtos.NavLink{
-		{Text: "Home", Url: setting.AppSubUrl + "/"},
-		{Text: "Playlists", Url: setting.AppSubUrl + "/playlists"},
-		{Text: "Snapshots", Url: setting.AppSubUrl + "/dashboard/snapshots"},
+		{Text: "首页", Url: setting.AppSubUrl + "/"},
+		{Text: "播放列表", Url: setting.AppSubUrl + "/playlists"},
 	}
 
 	if c.OrgRole == m.ROLE_ADMIN || c.OrgRole == m.ROLE_EDITOR {
 		dashboardChildNavs = append(dashboardChildNavs, &dtos.NavLink{Divider: true})
-		dashboardChildNavs = append(dashboardChildNavs, &dtos.NavLink{Text: "New", Icon: "fa fa-plus", Url: setting.AppSubUrl + "/dashboard/new"})
-		dashboardChildNavs = append(dashboardChildNavs, &dtos.NavLink{Text: "Import", Icon: "fa fa-download", Url: setting.AppSubUrl + "/dashboard/new/?editview=import"})
+		dashboardChildNavs = append(dashboardChildNavs, &dtos.NavLink{Text: "新建", Icon: "fa fa-plus", Url: setting.AppSubUrl + "/dashboard/new"})
+		dashboardChildNavs = append(dashboardChildNavs, &dtos.NavLink{Text: "导入", Icon: "fa fa-download", Url: setting.AppSubUrl + "/dashboard/new/?editview=import"})
 	}
 
 	data.MainNavLinks = append(data.MainNavLinks, &dtos.NavLink{
-		Text:     "Dashboards",
+		Text:     "仪表板",
 		Icon:     "icon-gf icon-gf-dashboard",
 		Url:      setting.AppSubUrl + "/",
 		Children: dashboardChildNavs,
@@ -119,13 +118,13 @@ func setIndexViewData(c *middleware.Context) (*dtos.IndexViewData, error) {
 
 	if c.OrgRole == m.ROLE_ADMIN {
 		data.MainNavLinks = append(data.MainNavLinks, &dtos.NavLink{
-			Text: "Data Sources",
+			Text: "数据源",
 			Icon: "icon-gf icon-gf-datasources",
 			Url:  setting.AppSubUrl + "/datasources",
 		})
 
 		data.MainNavLinks = append(data.MainNavLinks, &dtos.NavLink{
-			Text: "Plugins",
+			Text: "插件",
 			Icon: "icon-gf icon-gf-apps",
 			Url:  setting.AppSubUrl + "/plugins",
 		})
@@ -179,14 +178,12 @@ func setIndexViewData(c *middleware.Context) (*dtos.IndexViewData, error) {
 
 	if c.IsGrafanaAdmin {
 		data.MainNavLinks = append(data.MainNavLinks, &dtos.NavLink{
-			Text: "Admin",
+			Text: "管理",
 			Icon: "fa fa-fw fa-cogs",
 			Url:  setting.AppSubUrl + "/admin",
 			Children: []*dtos.NavLink{
-				{Text: "Global Users", Url: setting.AppSubUrl + "/admin/users"},
-				{Text: "Global Orgs", Url: setting.AppSubUrl + "/admin/orgs"},
-				{Text: "Server Settings", Url: setting.AppSubUrl + "/admin/settings"},
-				{Text: "Server Stats", Url: setting.AppSubUrl + "/admin/stats"},
+				{Text: "用户管理", Url: setting.AppSubUrl + "/admin/users"},
+				{Text: "统计信息", Url: setting.AppSubUrl + "/admin/stats"},
 			},
 		})
 	}
