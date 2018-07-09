@@ -2,7 +2,8 @@
 
 	<div class="modal-header">
 		<h2 class="modal-header-title">
-			{{modalTitle}}
+			<i class="fa fa-share-square-o"></i>
+			<span class="p-l-1">{{modalTitle}}</span>
 		</h2>
 
 		<ul class="gf-tabs">
@@ -31,7 +32,8 @@
 		</div>
 		<div class="share-modal-content">
 			<p class="share-modal-info-text">
-				以下 HTML 代码可以粘贴和嵌入其他网页中. 除非开启匿名访问，否则需要登录后才能查看.
+				The html code below can be pasted and included in another web page. Unless anonymous access
+				is enabled the user viewing that page need to be signed into grafana for the graph to load.
 			</p>
 
 			<div ng-include src="'shareLinkOptions.html'"></div>
@@ -46,22 +48,22 @@
 </script>
 
 <script type="text/ng-template" id="shareExport.html">
-	<dash-export-modal></dash-export-modal>
+	<dash-export-modal dismiss="dismiss()"></dash-export-modal>
 </script>
 
 <script type="text/ng-template" id="shareLinkOptions.html">
 	<div class="gf-form-group">
 		<gf-form-switch class="gf-form"
-			label="当前时间范围" label-class="width-12" switch-class="max-width-6"
+			label="Current time range" label-class="width-12" switch-class="max-width-6"
 			checked="options.forCurrent" on-change="buildUrl()">
 		</gf-form-switch>
 		<gf-form-switch class="gf-form"
-			label="模板变量" label-class="width-12" switch-class="max-width-6"
+			label="Template variables" label-class="width-12" switch-class="max-width-6"
 			checked="options.includeTemplateVars" on-change="buildUrl()">
 		</gf-form-switch>
 		<div class="gf-form">
-			<span class="gf-form-label width-12">主题</span>
-			<div class="gf-form-select-wrapper width-6">
+			<span class="gf-form-label width-12">Theme</span>
+			<div class="gf-form-select-wrapper width-10">
 				<select class="gf-form-input" ng-model="options.theme" ng-options="f as f for f in ['current', 'dark', 'light']" ng-change="buildUrl()"></select>
 			</div>
 		</div>

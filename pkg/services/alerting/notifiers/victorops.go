@@ -6,7 +6,6 @@ import (
 	"github.com/grafana/grafana/pkg/bus"
 	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/log"
-	"github.com/grafana/grafana/pkg/metrics"
 	"github.com/grafana/grafana/pkg/models"
 	"github.com/grafana/grafana/pkg/services/alerting"
 	"github.com/grafana/grafana/pkg/setting"
@@ -72,7 +71,6 @@ type VictoropsNotifier struct {
 // Notify sends notification to Victorops via POST to URL endpoint
 func (this *VictoropsNotifier) Notify(evalContext *alerting.EvalContext) error {
 	this.log.Info("Executing victorops notification", "ruleId", evalContext.Rule.Id, "notification", this.Name)
-	metrics.M_Alerting_Notification_Sent_Victorops.Inc(1)
 
 	ruleUrl, err := evalContext.GetRuleUrl()
 	if err != nil {
@@ -83,27 +81,6 @@ func (this *VictoropsNotifier) Notify(evalContext *alerting.EvalContext) error {
 	if evalContext.Rule.State == models.AlertStateOK && !this.AutoResolve {
 		this.log.Info("Not alerting VictorOps", "state", evalContext.Rule.State, "auto resolve", this.AutoResolve)
 		return nil
-	}
-
-	fields := make([]map[string]interface{}, 0)
-	fieldLimitCount := 4
-	for index, evt := range evalContext.EvalMatches {
-		fields = append(fields, map[string]interface{}{
-			"title": evt.Metric,
-			"value": evt.Value,
-			"short": true,
-		})
-		if index > fieldLimitCount {
-			break
-		}
-	}
-
-	if evalContext.Error != nil {
-		fields = append(fields, map[string]interface{}{
-			"title": "Error message",
-			"value": evalContext.Error.Error(),
-			"short": false,
-		})
 	}
 
 	messageType := evalContext.Rule.State

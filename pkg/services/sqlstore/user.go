@@ -22,12 +22,12 @@ func init() {
 	bus.AddHandler("sql", GetUserByLogin)
 	bus.AddHandler("sql", GetUserByEmail)
 	bus.AddHandler("sql", SetUsingOrg)
+	bus.AddHandler("sql", UpdateUserLastSeenAt)
 	bus.AddHandler("sql", GetUserProfile)
 	bus.AddHandler("sql", GetSignedInUser)
 	bus.AddHandler("sql", SearchUsers)
 	bus.AddHandler("sql", GetUserOrgList)
 	bus.AddHandler("sql", DeleteUser)
-	bus.AddHandler("sql", SetUsingOrg)
 	bus.AddHandler("sql", UpdateUserPermissions)
 	bus.AddHandler("sql", SetUserHelpFlag)
 }
@@ -47,10 +47,9 @@ func getOrgIdForNewUser(cmd *m.CreateUserCommand, sess *DBSession) (int64, error
 		}
 		if has {
 			return org.Id, nil
-		} else {
-			org.Name = "Main Org."
-			org.Id = 1
 		}
+		org.Name = "Main Org."
+		org.Id = 1
 	} else {
 		org.Name = cmd.OrgName
 		if len(org.Name) == 0 {
@@ -61,8 +60,14 @@ func getOrgIdForNewUser(cmd *m.CreateUserCommand, sess *DBSession) (int64, error
 	org.Created = time.Now()
 	org.Updated = time.Now()
 
-	if _, err := sess.Insert(&org); err != nil {
-		return 0, err
+	if org.Id != 0 {
+		if _, err := sess.InsertId(&org); err != nil {
+			return 0, err
+		}
+	} else {
+		if _, err := sess.InsertOne(&org); err != nil {
+			return 0, err
+		}
 	}
 
 	sess.publishAfterCommit(&events.OrgCreated{
@@ -96,6 +101,7 @@ func CreateUser(cmd *m.CreateUserCommand) error {
 			EmailVerified: cmd.EmailVerified,
 			Created:       time.Now(),
 			Updated:       time.Now(),
+			LastSeenAt:    time.Now().AddDate(-10, 0, 0),
 		}
 
 		if len(cmd.Password) > 0 {
@@ -153,7 +159,7 @@ func GetUserById(query *m.GetUserByIdQuery) error {
 
 	if err != nil {
 		return err
-	} else if has == false {
+	} else if !has {
 		return m.ErrUserNotFound
 	}
 
@@ -167,18 +173,16 @@ func GetUserByLogin(query *m.GetUserByLoginQuery) error {
 		return m.ErrUserNotFound
 	}
 
-	user := new(m.User)
-
 	// Try and find the user by login first.
 	// It's not sufficient to assume that a LoginOrEmail with an "@" is an email.
-	user = &m.User{Login: query.LoginOrEmail}
+	user := &m.User{Login: query.LoginOrEmail}
 	has, err := x.Get(user)
 
 	if err != nil {
 		return err
 	}
 
-	if has == false && strings.Contains(query.LoginOrEmail, "@") {
+	if !has && strings.Contains(query.LoginOrEmail, "@") {
 		// If the user wasn't found, and it contains an "@" fallback to finding the
 		// user by email.
 		user = &m.User{Email: query.LoginOrEmail}
@@ -187,7 +191,7 @@ func GetUserByLogin(query *m.GetUserByLoginQuery) error {
 
 	if err != nil {
 		return err
-	} else if has == false {
+	} else if !has {
 		return m.ErrUserNotFound
 	}
 
@@ -201,14 +205,12 @@ func GetUserByEmail(query *m.GetUserByEmailQuery) error {
 		return m.ErrUserNotFound
 	}
 
-	user := new(m.User)
-
-	user = &m.User{Email: query.Email}
+	user := &m.User{Email: query.Email}
 	has, err := x.Get(user)
 
 	if err != nil {
 		return err
-	} else if has == false {
+	} else if !has {
 		return m.ErrUserNotFound
 	}
 
@@ -252,11 +254,23 @@ func ChangeUserPassword(cmd *m.ChangeUserPasswordCommand) error {
 			Updated:  time.Now(),
 		}
 
-		if _, err := sess.Id(cmd.UserId).Update(&user); err != nil {
-			return err
+		_, err := sess.Id(cmd.UserId).Update(&user)
+		return err
+	})
+}
+
+func UpdateUserLastSeenAt(cmd *m.UpdateUserLastSeenAtCommand) error {
+	return inTransaction(func(sess *DBSession) error {
+		if cmd.UserId <= 0 {
 		}
 
-		return nil
+		user := m.User{
+			Id:         cmd.UserId,
+			LastSeenAt: time.Now(),
+		}
+
+		_, err := sess.Id(cmd.UserId).Update(&user)
+		return err
 	})
 }
 
@@ -276,13 +290,18 @@ func SetUsingOrg(cmd *m.SetUsingOrgCommand) error {
 	}
 
 	return inTransaction(func(sess *DBSession) error {
-		user := m.User{}
-		sess.Id(cmd.UserId).Get(&user)
-
-		user.OrgId = cmd.OrgId
-		_, err := sess.Id(user.Id).Update(&user)
-		return err
+		return setUsingOrgInTransaction(sess, cmd.UserId, cmd.OrgId)
 	})
+}
+
+func setUsingOrgInTransaction(sess *DBSession, userID int64, orgID int64) error {
+	user := m.User{
+		Id:    userID,
+		OrgId: orgID,
+	}
+
+	_, err := sess.Id(userID).Update(&user)
+	return err
 }
 
 func GetUserProfile(query *m.GetUserProfileQuery) error {
@@ -291,11 +310,12 @@ func GetUserProfile(query *m.GetUserProfileQuery) error {
 
 	if err != nil {
 		return err
-	} else if has == false {
+	} else if !has {
 		return m.ErrUserNotFound
 	}
 
 	query.Result = m.UserProfileDTO{
+		Id:             user.Id,
 		Name:           user.Name,
 		Email:          user.Email,
 		Login:          user.Login,
@@ -313,6 +333,7 @@ func GetUserOrgList(query *m.GetUserOrgListQuery) error {
 	sess.Join("INNER", "org", "org_user.org_id=org.id")
 	sess.Where("org_user.user_id=?", query.UserId)
 	sess.Cols("org.name", "org_user.role", "org_user.org_id")
+	sess.OrderBy("org.name")
 	err := sess.Find(&query.Result)
 	return err
 }
@@ -324,15 +345,17 @@ func GetSignedInUser(query *m.GetSignedInUserQuery) error {
 	}
 
 	var rawSql = `SELECT
-		u.id           as user_id,
-		u.is_admin     as is_grafana_admin,
-		u.email        as email,
-		u.login        as login,
-		u.name         as name,
-		u.help_flags1  as help_flags1,
-		org.name       as org_name,
-		org_user.role  as org_role,
-		org.id         as org_id
+		u.id             as user_id,
+		u.is_admin       as is_grafana_admin,
+		u.email          as email,
+		u.login          as login,
+		u.name           as name,
+		u.help_flags1    as help_flags1,
+		u.last_seen_at   as last_seen_at,
+		(SELECT COUNT(*) FROM org_user where org_user.user_id = u.id) as org_count,
+		org.name         as org_name,
+		org_user.role    as org_role,
+		org.id           as org_id
 		FROM ` + dialect.Quote("user") + ` as u
 		LEFT OUTER JOIN org_user on org_user.org_id = ` + orgId + ` and org_user.user_id = u.id
 		LEFT OUTER JOIN org on org.id = org_user.org_id `
@@ -367,27 +390,49 @@ func SearchUsers(query *m.SearchUsersQuery) error {
 	query.Result = m.SearchUserQueryResult{
 		Users: make([]*m.UserSearchHitDTO, 0),
 	}
+
 	queryWithWildcards := "%" + query.Query + "%"
 
+	whereConditions := make([]string, 0)
+	whereParams := make([]interface{}, 0)
 	sess := x.Table("user")
-	if query.Query != "" {
-		sess.Where("email LIKE ? OR name LIKE ? OR login like ?", queryWithWildcards, queryWithWildcards, queryWithWildcards)
+
+	if query.OrgId > 0 {
+		whereConditions = append(whereConditions, "org_id = ?")
+		whereParams = append(whereParams, query.OrgId)
 	}
+
+	if query.Query != "" {
+		whereConditions = append(whereConditions, "(email "+dialect.LikeStr()+" ? OR name "+dialect.LikeStr()+" ? OR login "+dialect.LikeStr()+" ?)")
+		whereParams = append(whereParams, queryWithWildcards, queryWithWildcards, queryWithWildcards)
+	}
+
+	if len(whereConditions) > 0 {
+		sess.Where(strings.Join(whereConditions, " AND "), whereParams...)
+	}
+
 	offset := query.Limit * (query.Page - 1)
 	sess.Limit(query.Limit, offset)
-	sess.Cols("id", "email", "name", "login", "is_admin")
+	sess.Cols("id", "email", "name", "login", "is_admin", "last_seen_at")
 	if err := sess.Find(&query.Result.Users); err != nil {
 		return err
 	}
 
+	// get total
 	user := m.User{}
-
 	countSess := x.Table("user")
-	if query.Query != "" {
-		countSess.Where("email LIKE ? OR name LIKE ? OR login like ?", queryWithWildcards, queryWithWildcards, queryWithWildcards)
+
+	if len(whereConditions) > 0 {
+		countSess.Where(strings.Join(whereConditions, " AND "), whereParams...)
 	}
+
 	count, err := countSess.Count(&user)
 	query.Result.TotalCount = count
+
+	for _, user := range query.Result.Users {
+		user.LastSeenAtAge = util.GetAgeString(user.LastSeenAt)
+	}
+
 	return err
 }
 
@@ -396,6 +441,11 @@ func DeleteUser(cmd *m.DeleteUserCommand) error {
 		deletes := []string{
 			"DELETE FROM star WHERE user_id = ?",
 			"DELETE FROM " + dialect.Quote("user") + " WHERE id = ?",
+			"DELETE FROM org_user WHERE user_id = ?",
+			"DELETE FROM dashboard_acl WHERE user_id = ?",
+			"DELETE FROM preferences WHERE user_id = ?",
+			"DELETE FROM team_member WHERE user_id = ?",
+			"DELETE FROM user_auth WHERE user_id = ?",
 		}
 
 		for _, sql := range deletes {
@@ -430,10 +480,7 @@ func SetUserHelpFlag(cmd *m.SetUserHelpFlagCommand) error {
 			Updated:    time.Now(),
 		}
 
-		if _, err := sess.Id(cmd.UserId).Cols("help_flags1").Update(&user); err != nil {
-			return err
-		}
-
-		return nil
+		_, err := sess.Id(cmd.UserId).Cols("help_flags1").Update(&user)
+		return err
 	})
 }

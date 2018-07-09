@@ -1,203 +1,84 @@
-///<reference path="../headers/common.d.ts" />
-
 import coreModule from 'app/core/core_module';
+import config from 'app/core/config';
+import _ from 'lodash';
 
 export interface NavModelItem {
-  title: string;
+  text: string;
   url: string;
   icon?: string;
-  iconUrl?: string;
+  img?: string;
+  id: string;
+  active?: boolean;
+  hideFromTabs?: boolean;
+  divider?: boolean;
+  children: NavModelItem[];
+  target?: string;
 }
 
-export interface NavModel {
-  section: NavModelItem;
-  menu: NavModelItem[];
+export class NavModel {
+  breadcrumbs: NavModelItem[];
+  main: NavModelItem;
+  node: NavModelItem;
+
+  constructor() {
+    this.breadcrumbs = [];
+  }
 }
 
 export class NavModelSrv {
-
+  navItems: any;
 
   /** @ngInject */
-  constructor(private contextSrv) {
+  constructor() {
+    this.navItems = config.bootData.navTree;
   }
 
-  getAlertingNav(subPage) {
-    return {
-      section: {
-        title: 'Alerting',
-        url: 'plugins',
-        icon: 'icon-gf icon-gf-alert'
-      },
-      menu: [
-        {title: 'Alert List', active: subPage === 0, url: 'alerting/list', icon: 'fa fa-list-ul'},
-        {title: 'Notification channels', active: subPage === 1, url: 'alerting/notifications', icon: 'fa fa-bell-o'},
-      ]
-    };
+  getCfgNode() {
+    return _.find(this.navItems, { id: 'cfg' });
   }
 
-  getDatasourceNav(subPage) {
-    return {
-      section: {
-        title: '数据源',
-        url: 'datasources',
-        icon: 'icon-gf icon-gf-datasources'
-      },
-      menu: [
-        {title: '清单', active: subPage === 0, url: 'datasources', icon: 'fa fa-list-ul'},
-        {title: '新建', active: subPage === 1, url: 'datasources/new', icon: 'fa fa-plus'},
-      ]
-    };
-  }
+  getNav(...args) {
+    var children = this.navItems;
+    var nav = new NavModel();
 
-  getPlaylistsNav(subPage) {
-    return {
-      section: {
-        title: '播放列表',
-        url: 'playlists',
-        icon: 'fa fa-fw fa-film'
-      },
-      menu: [
-        {title: '清单', active: subPage === 0, url: 'playlists', icon: 'fa fa-list-ul'},
-        {title: '新建', active: subPage === 1, url: 'playlists/create', icon: 'fa fa-plus'},
-      ]
-    };
-  }
+    for (let id of args) {
+      // if its a number then it's the index to use for main
+      if (_.isNumber(id)) {
+        nav.main = nav.breadcrumbs[id];
+        break;
+      }
 
-  getProfileNav() {
-    return {
-      section: {
-        title: '个人设置',
-        url: 'profile',
-        icon: 'fa fa-fw fa-user'
-      },
-      menu: []
-    };
-  }
-
-  getNotFoundNav() {
-    return {
-      section: {
-        title: 'Page',
-        url: '',
-        icon: 'fa fa-fw fa-warning'
-      },
-      menu: []
-    };
-  }
-
-  getOrgNav(subPage) {
-    return {
-      section: {
-        title: 'Organization',
-        url: 'org',
-        icon: 'icon-gf icon-gf-users'
-      },
-      menu: [
-        {title: 'Preferences', active: subPage === 0, url: 'org', icon: 'fa fa-fw fa-cog'},
-        {title: 'Org Users', active: subPage === 1, url: 'org/users', icon: 'fa fa-fw fa-users'},
-        {title: 'API Keys', active: subPage === 2, url: 'org/apikeys', icon: 'fa fa-fw fa-key'},
-      ]
-    };
-  }
-
-  getAdminNav(subPage) {
-    return {
-      section: {
-        title: '管理',
-        url: 'admin',
-        icon: 'fa fa-fw fa-cogs'
-      },
-      menu: [
-        {title: '用户管理', active: subPage === 0, url: 'admin/users', icon: 'fa fa-fw fa-user'},
-        {title: '统计信息', active: subPage === 2, url: 'admin/stats', icon: 'fa fa-fw fa-line-chart'},
-      ]
-    };
-  }
-
-  getPluginsNav() {
-    return {
-      section: {
-        title: '插件',
-        url: 'plugins',
-        icon: 'icon-gf icon-gf-apps'
-      },
-      menu: []
-    };
-  }
-
-  getDashboardNav(dashboard, dashNavCtrl) {
-    // special handling for snapshots
-    if (dashboard.meta.isSnapshot) {
-      return {
-        section: {
-          title: dashboard.title,
-          icon: 'icon-gf icon-gf-snapshot'
-        },
-        menu: [
-          {
-            title: 'Go to original dashboard',
-            icon: 'fa fa-fw fa-external-link',
-            url: dashboard.snapshot.originalUrl,
-          }
-        ]
-      };
+      let node = _.find(children, { id: id });
+      nav.breadcrumbs.push(node);
+      nav.node = node;
+      nav.main = node;
+      children = node.children;
     }
 
-    var menu = [];
+    if (nav.main.children) {
+      for (let item of nav.main.children) {
+        item.active = false;
 
-    if (dashboard.meta.canEdit) {
-      menu.push({
-        title: '设置',
-        icon: 'fa fa-fw fa-cog',
-        clickHandler: () => dashNavCtrl.openEditView('settings')
-      });
-
-      menu.push({
-        title: '模板',
-        icon: 'fa fa-fw fa-code',
-        clickHandler: () => dashNavCtrl.openEditView('templating')
-      });
-
-      if (!dashboard.meta.isHome) {
-        menu.push({
-          title: '版本',
-          icon: 'fa fa-fw fa-history',
-          clickHandler: () => dashNavCtrl.openEditView('history')
-        });
+        if (item.url === nav.node.url) {
+          item.active = true;
+        }
       }
     }
 
-    if (this.contextSrv.isEditor && !dashboard.editable) {
-      menu.push({
-        title: '设为可写',
-        icon: 'fa fa-fw fa-edit',
-        clickHandler: () => dashNavCtrl.makeEditable()
-      });
-    }
+    return nav;
+  }
 
-    if (this.contextSrv.isEditor) {
-      menu.push({
-        title: '另存为...',
-        icon: 'fa fa-fw fa-save',
-        clickHandler: () => dashNavCtrl.saveDashboardAs()
-      });
-    }
-
-    if (dashboard.meta.canSave) {
-      menu.push({
-        title: '删除',
-        icon: 'fa fa-fw fa-trash',
-        clickHandler: () => dashNavCtrl.deleteDashboard()
-      });
-
-    }
+  getNotFoundNav() {
+    var node = {
+      text: 'Page not found',
+      icon: 'fa fa-fw fa-warning',
+      subTitle: '404 Error',
+    };
 
     return {
-      section: {
-        title: dashboard.title,
-        icon: 'icon-gf icon-gf-dashboard'
-      },
-      menu: menu
+      breadcrumbs: [node],
+      node: node,
+      main: node,
     };
   }
 }
